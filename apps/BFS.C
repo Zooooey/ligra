@@ -40,17 +40,33 @@ struct BFS_F {
 template <class vertex>
 void Compute(graph<vertex>& GA, commandLine P) {
   long start = P.getOptionLongValue("-r",0);
+  //应该是Graph的数量
   long n = GA.n;
+  GA.print_address();
   //creates Parents array, initialized to all -1, except for start
+  //[内存]new A是对malloc的一个别名，这里创建了一个连续内存空间。
   uintE* Parents = newA(uintE,n);
   parallel_for(long i=0;i<n;i++) Parents[i] = UINT_E_MAX;
+  pbbs::print_address("Parent", Parents, Parents + n);
   Parents[start] = start;
+
+  //以单个vertex初始化一个vertexSubset
   vertexSubset Frontier(n,start); //creates initial frontier
+  uintE* S = newA(uintE,n);
+  bool* D = newA(bool,n);
+  memset(S,0,sizeof(uintE)*n);
+  memset(D,0,sizeof(bool)*n);
+  pbbs::print_address("Fontier vertices", (unsigned long)(void*)S, (unsigned long)(void*)(S + n));
+  pbbs::print_address("Fontier bool array", (unsigned long)(void*)D, (unsigned long)(void*)(D + n));
+  Frontier.setD(D,sizeof(bool)*n);
+  Frontier.setS(S,sizeof(uintE)*n);
   while(!Frontier.isEmpty()){ //loop until frontier is empty
-    vertexSubset output = edgeMap(GA, Frontier, BFS_F(Parents));    
+    vertexSubset output = bfsEdgeMap(GA, Frontier, BFS_F(Parents));
     Frontier.del();
     Frontier = output; //set new frontier
   } 
   Frontier.del();
   free(Parents); 
+  free(S);
+  free(D);
 }

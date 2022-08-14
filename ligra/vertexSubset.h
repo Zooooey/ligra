@@ -100,8 +100,41 @@ struct vertexSubsetData {
     }
     isDense = true;
   }
-
-
+  S* getS(){
+    return s;
+  }
+  D* getD(){
+    return d;
+  }
+  void setS(S* newPointer, size_t size){
+    if (s!=NULL){
+      memcpy(newPointer,s,sizeof(S)*m);
+      free(s)
+    }
+    s = newPointer;
+    s_size = size;
+  }
+  void setD(D* newPointer, size_t size){
+    if(d!=NULL){
+      memcpy(newPointer,d,sizeof(D)*n);
+      free(d)
+    }
+    d = newPointer;
+    d_size = size;
+  }
+  size_t getD_size(){
+    return d_size;
+  }
+  size_t getS_size(){
+    return s_size;
+  }
+  S* getS(){
+    return s;
+  }
+  D* getD(){
+    return d;
+  }
+  size_t d_size,s_size;
   S* s;
   D* d;
   size_t n, m;
@@ -115,7 +148,7 @@ struct vertexSubsetData<pbbs::empty> {
 
   // An empty vertex set.
   vertexSubsetData<pbbs::empty>(size_t _n) : n(_n), m(0), d(NULL), s(NULL), isDense(0) {}
-
+ 
   // A vertexSubset with a single vertex.
   vertexSubsetData<pbbs::empty>(long _n, uintE v)
   : n(_n), m(1), d(NULL), isDense(0) {
@@ -190,12 +223,16 @@ struct vertexSubsetData<pbbs::empty> {
   long numRows() { return n; }
   long numNonzeros() { return m; }
 
+  //为了bfs修改，我们不要反复释放这个class 的object，直接修改即可
+  //void setN(long in) { this.n = in;}
+  //void setM(long in) { this.m = in;}
+
   bool isEmpty() { return m==0; }
   bool dense() { return isDense; }
 
   void toSparse() {
     if (s == NULL && m > 0) {
-      auto _d = d;
+      auto _d = d
       auto f = [&] (size_t i) { return _d[i]; };
       auto f_in = make_in_imap<bool>(n, f);
       auto out = pbbs::pack_index<uintE>(f_in);
@@ -219,7 +256,35 @@ struct vertexSubsetData<pbbs::empty> {
     }
     isDense = true;
   }
-
+  void setS(S* newPointer, size_t size){
+    if (s!=NULL){
+      memcpy(newPointer,s,sizeof(S)*m);
+      free(s)
+    }
+    s = newPointer;
+    s_size = size;
+  }
+  void setD(D* newPointer, size_t size){
+    if(d!=NULL){
+      memcpy(newPointer,d,sizeof(D)*n);
+      free(d)
+    }
+    d = newPointer;
+    d_size = size;
+  }
+  size_t getD_size(){
+    return d_size;
+  }
+  size_t getS_size(){
+    return s_size;
+  }
+  S* getS(){
+    return s;
+  }
+  D* getD(){
+    return d;
+  }
+  size_t d_size,s_size;
   S* s;
   bool* d;
   size_t n, m;

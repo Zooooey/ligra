@@ -187,6 +187,7 @@ namespace decode_uncompressed {
 
 struct symmetricVertex {
 #ifndef WEIGHTED
+  //[内存]点结构记录了它的所有邻居,是否需要把这一块内存连起来？
   uintE* neighbors;
 #else
   intE* neighbors;

@@ -6,6 +6,7 @@
 #include "vertex.h"
 #include "compressedVertex.h"
 #include "parallel.h"
+#include "utils.h"
 using namespace std;
 
 // **************************************************************
@@ -19,6 +20,11 @@ public:
   virtual void del() = 0;
 };
 
+/**
+ * @brief v是一个连续内存空间，记录点集；n是点的数量；m是adj数组的长度，参数4edges就是adj数组。这两个结构都是以指针的形势传入，所以监控内存可以不用在里面监控
+ * 
+ * @tparam vertex 
+ */
 template <class vertex>
 struct Uncompressed_Mem : public Deletable {
 public:
@@ -97,6 +103,7 @@ public:
 
 template <class vertex>
 struct graph {
+  //TODO: Graph里的点集用的是指针？不会是malloc吧
   vertex *V;
   long n;
   long m;
@@ -114,6 +121,11 @@ graph(vertex* _V, long _n, long _m, Deletable* _D, uintE* _flags) : V(_V),
     if (flags != NULL) free(flags);
     D->del();
     free(D);
+  }
+
+  void print_address(){
+    pbbs:print_address("Vertex set", (unsigned long)(void*)V, (unsigned long)(void*)(V+n));
+    pbbs:print_address("Adj",(unsigned long)(void*)(uintE *)D, (unsigned long)(void*)(uintE *)(D+m));
   }
 
   void transpose() {
