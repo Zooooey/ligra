@@ -37,6 +37,7 @@ struct vertexSubsetData {
   : n(0), m(0), s(NULL), d(NULL), isDense(0) { }
 
   void del() {
+    if(!shouldFree)return;
     if (d != NULL) free(d);
     if (s != NULL) free(s);
   }
@@ -100,6 +101,9 @@ struct vertexSubsetData {
     }
     isDense = true;
   }
+  void setShouldFree(bool b){
+    shouldFree = b;
+  }
   void setS(S* newPointer, size_t size){
     if (s!=NULL){
       memcpy(newPointer,s,sizeof(S)*m);
@@ -131,6 +135,7 @@ struct vertexSubsetData {
   size_t d_size,s_size;
   S* s;
   D* d;
+  bool shouldFree = true;
   size_t n, m;
   bool isDense;
 };
@@ -181,6 +186,7 @@ struct vertexSubsetData<pbbs::empty> {
   }
 
   void del() {
+    if(!shouldFree)return;
     if (d != NULL) free(d);
     if (s != NULL) free(s);
   }
@@ -250,6 +256,9 @@ struct vertexSubsetData<pbbs::empty> {
     }
     isDense = true;
   }
+  void setShouldFree(bool b){
+    shouldFree = b;
+  }
   void setS(S* newPointer, size_t size){
     if (s!=NULL){
       memcpy(newPointer,s,sizeof(S)*m);
@@ -281,6 +290,7 @@ struct vertexSubsetData<pbbs::empty> {
   size_t d_size,s_size;
   S* s;
   bool* d;
+  bool shouldFree = true;
   size_t n, m;
   bool isDense;
 };
