@@ -409,7 +409,7 @@ graph<vertex> readGraphFromBinary(char *iFile, bool isSymmetric)
   long n;
   in >> n;
   in.close();
-  // adjFile是边列表信息
+  
   ifstream in2(adjFile, ifstream::in | ios::binary); // stored as uints
   in2.seekg(0, ios::end);
   long size = in2.tellg();
