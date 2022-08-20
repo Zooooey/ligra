@@ -443,10 +443,12 @@ vertexSubsetData<data> bfsEdgeMapData(graph<vertex> &GA, VS &vs, F f,
       ret.setS(vs.getS(),vs.getS_size());
       return ret;
     }
-    /*auto vs_out =
+    auto vs_out =
         (should_output(fl) && fl & sparse_no_filter) ? // only call snof when we output
             edgeMapSparse_no_filter<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl)
-                                                     : edgeMapSparse<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl);*/
+                                                     : edgeMapSparse<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl);
+    vs_out.setD(vs.getD(), vs.getD_size());
+    vs_out.setS(vs.getS(), vs.getS_size());
     free(degrees);
     free(frontierVertices);
     return vs_out;

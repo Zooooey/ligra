@@ -100,16 +100,10 @@ struct vertexSubsetData {
     }
     isDense = true;
   }
-  S* getS(){
-    return s;
-  }
-  D* getD(){
-    return d;
-  }
   void setS(S* newPointer, size_t size){
     if (s!=NULL){
       memcpy(newPointer,s,sizeof(S)*m);
-      free(s)
+      free(s);
     }
     s = newPointer;
     s_size = size;
@@ -117,7 +111,7 @@ struct vertexSubsetData {
   void setD(D* newPointer, size_t size){
     if(d!=NULL){
       memcpy(newPointer,d,sizeof(D)*n);
-      free(d)
+      free(d);
     }
     d = newPointer;
     d_size = size;
@@ -232,7 +226,7 @@ struct vertexSubsetData<pbbs::empty> {
 
   void toSparse() {
     if (s == NULL && m > 0) {
-      auto _d = d
+      auto _d = d;
       auto f = [&] (size_t i) { return _d[i]; };
       auto f_in = make_in_imap<bool>(n, f);
       auto out = pbbs::pack_index<uintE>(f_in);
@@ -259,15 +253,15 @@ struct vertexSubsetData<pbbs::empty> {
   void setS(S* newPointer, size_t size){
     if (s!=NULL){
       memcpy(newPointer,s,sizeof(S)*m);
-      free(s)
+      free(s);
     }
     s = newPointer;
     s_size = size;
   }
-  void setD(D* newPointer, size_t size){
+  void setD(bool* newPointer, size_t size){
     if(d!=NULL){
-      memcpy(newPointer,d,sizeof(D)*n);
-      free(d)
+      memcpy(newPointer,d,sizeof(bool)*n);
+      free(d);
     }
     d = newPointer;
     d_size = size;
@@ -281,7 +275,7 @@ struct vertexSubsetData<pbbs::empty> {
   S* getS(){
     return s;
   }
-  D* getD(){
+  bool* getD(){
     return d;
   }
   size_t d_size,s_size;

@@ -47,7 +47,7 @@ void Compute(graph<vertex>& GA, commandLine P) {
   //[内存]new A是对malloc的一个别名，这里创建了一个连续内存空间。
   uintE* Parents = newA(uintE,n);
   parallel_for(long i=0;i<n;i++) Parents[i] = UINT_E_MAX;
-  pbbs::print_address("Parent", Parents, Parents + n);
+  pbbs::print_address("Parent", (unsigned long)(void*)Parents, (unsigned long)(void*)(Parents + n));
   Parents[start] = start;
 
   //以单个vertex初始化一个vertexSubset

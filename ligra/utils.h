@@ -26,7 +26,11 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <unistd.h>
 #include "parallel.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 using namespace std;
 
 // Needed to make frequent large allocations efficient with standard
