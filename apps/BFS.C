@@ -42,35 +42,97 @@ void Compute(graph<vertex>& GA, commandLine P) {
   long start = P.getOptionLongValue("-r",0);
   //应该是Graph的数量
   long n = GA.n;
-  GA.print_address();
+  //GA.print_address();
   //creates Parents array, initialized to all -1, except for start
   //[内存]new A是对malloc的一个别名，这里创建了一个连续内存空间。
-  uintE* Parents = newA(uintE,n);
+  //uintE* Parents = newA(uintE,n);
+  int page_num = (n*sizeof(uintE))/2097152 + 1;
+  long parent_size = page_num * 2097152;
+  uintE *Parents = (uintE*)mmap(NULL, parent_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,-1, 0);
+  if(Parents == MAP_FAILED){
+	printf("mmap failed!\n")	;
+	exit(-1);
+  } 
   parallel_for(long i=0;i<n;i++) Parents[i] = UINT_E_MAX;
-  pbbs::print_address("Parent", (unsigned long)(void*)Parents, (unsigned long)(void*)(Parents + n));
+  unsigned long start_addr = (unsigned long)(void*)Parents ;
+  unsigned long end_addr = ((unsigned long)(void*)Parents) + sizeof(uintE)*n;
+  unsigned long p = start_addr;
+  for(;p<end_addr;p+=2097152){
+    char c = *((char*)p );
+  	pbbs::print_addr("Parents",p)	;
+  }
+  //pbbs::print_address("Parents",start_addr,end_addr);
+  //pbbs::print_address("Parent", (unsigned long)(void*)Parents, (unsigned long)(void*)(Parents + n));
   Parents[start] = start;
+/*
+  void *ptr = mmap(NULL, 8 * (1 << 21), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,-1, 0);
+  if(ptr == MAP_FAILED){
+	printf("mmap failed!\n")	;
+	exit(-1);
+  }
+  unsigned long p = (unsigned long)ptr;
+  unsigned long end = p + (1 <<21)*8;
+  for(;p<end-4096;p+=4096)  {
+  	pbbs::print_addr("Huge Pages",p);
+	}
+  return;
+*/
 
   //以单个vertex初始化一个vertexSubset
   vertexSubset Frontier(n,start); //creates initial frontier
-  uintE* S = newA(uintE,n);
-  bool* D = newA(bool,n);
+  //uintE* S = newA(uintE,n);
+  int S_page_num = (n*sizeof(uintE))/2097152 + 1;
+  long S_size = S_page_num * 2097152;
+  uintE *S = (uintE*)mmap(NULL, S_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,-1, 0);
+  if(S == MAP_FAILED){
+	printf("mmap failed!\n")	;
+	exit(-1);
+  } 
   memset(S,0,sizeof(uintE)*n);
+  start_addr = (unsigned long)(void*)S ;
+  end_addr = ((unsigned long)(void*)S) + sizeof(uintE)*n;
+  p = start_addr;
+  for(;p<end_addr;p+=2097152){
+    char c = *((char*)p );
+  	pbbs::print_addr("Frontier vertices",p)	;
+  }
+
+  //bool* D = newA(bool,n);
+  int D_page_num = (n*sizeof(bool))/2097152 + 1;
+  long D_size = D_page_num * 2097152;
+  bool *D = (bool*)mmap(NULL, D_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,-1, 0);
+  if(D == MAP_FAILED){
+	printf("mmap failed!\n")	;
+	exit(-1);
+  } 
   memset(D,0,sizeof(bool)*n);
-  pbbs::print_address("Fontier vertices", (unsigned long)(void*)S, (unsigned long)(void*)(S + n));
-  pbbs::print_address("Fontier bool array", (unsigned long)(void*)D, (unsigned long)(void*)(D + n));
+  start_addr = (unsigned long)(void*)D ;
+  end_addr = ((unsigned long)(void*)D) + sizeof(bool)*n;
+  p = start_addr;
+  for(;p<end_addr;p+=2097152){
+    char c = *((char*)p );
+  	pbbs::print_addr("Frontier bool",p)	;
+  }
+  //pbbs::print_address("Fontier vertices", (unsigned long)(void*)S, (unsigned long)(void*)(S + n));
+  //pbbs::print_address("Fontier bool array", (unsigned long)(void*)D, (unsigned long)(void*)(D + n));
   Frontier.setD(D,sizeof(bool)*n);
   Frontier.setS(S,sizeof(uintE)*n);
   Frontier.setShouldFree(false);
+  int times = 0;
   while(!Frontier.isEmpty()){ //loop until frontier is empty
     vertexSubset output = bfsEdgeMap(GA, Frontier, BFS_F(Parents));
-    printf("return from bfsEdgeMap!\n");
+    //printf("return from bfsEdgeMap!\n");
     Frontier.del();
-    printf("Frontier.del()!\n");
+    //printf("Frontier.del()!\n");
     Frontier = output; //set new frontier
-    printf("=output\n");
+    //printf("=output\n");
+    times++;
+	printf("round :%d\n",times);
   } 
+  printf("pre end\n");
   Frontier.del();
-  free(Parents); 
-  free(S);
-  free(D);
+  printf("post end\n");
+  //free(Parents); 
+  //free(S);
+  //free(D);
 }

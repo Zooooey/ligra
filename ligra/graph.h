@@ -124,8 +124,11 @@ graph(vertex* _V, long _n, long _m, Deletable* _D, uintE* _flags) : V(_V),
   }
 
   void print_address(){
-    pbbs::print_address("Vertex set", (unsigned long)(void*)V, (unsigned long)(void*)(V+n));
-    pbbs::print_address("Adj",(unsigned long)(void*)(uintE *)D, (unsigned long)(void*)(uintE *)(D+m));
+	//for(int i=0;i<=n;i++){
+	//	pbbs::print_addr("Vertex set", (unsigned long)(void*)(V+i));
+	//}
+    //pbbs::print_address("Vertex set", (unsigned long)(void*)V, (unsigned long)(void*)(V+n));
+    //pbbs::print_address("Adj",(unsigned long)(void*)(uintE *)D, (unsigned long)(void*)(uintE *)(D+m));
   }
 
   void transpose() {

@@ -355,7 +355,7 @@ template <class data, class vertex, class VS, class F>
 vertexSubsetData<data> bfsEdgeMapData(graph<vertex> &GA, VS &vs, F f,
                                    intT threshold = -1, const flags &fl = 0)
 {
-  printf("bfs EdgeMapData!\n");
+  //printf("bfs EdgeMapData!\n");
   //似乎Ligra有一个优化机制，可以查看subset里得非零点得数量,这个numNonzeros就是
   long numVertices = GA.n, numEdges = GA.m, m = vs.numNonzeros();
   //如论文所说，除20就是threshold
@@ -367,7 +367,7 @@ vertexSubsetData<data> bfsEdgeMapData(graph<vertex> &GA, VS &vs, F f,
     cout << "edgeMap: Sizes Don't match" << endl;
     abort();
   }
-  printf("step1!\n");
+  //printf("step1!\n");
   //这里只传递了一个num，所以返回的subset肯定是空的
   if (m == 0){
     vertexSubsetData<data> ret = vertexSubsetData<data>(numVertices);
@@ -380,7 +380,7 @@ vertexSubsetData<data> bfsEdgeMapData(graph<vertex> &GA, VS &vs, F f,
   uintT *degrees = NULL;
   vertex *frontierVertices = NULL;
   uintT outDegrees = 0;
-  printf("step2!\n");
+  //printf("step2!\n");
 
   if (threshold > 0)
   { // compute sum of out-degrees if threshold > 0
@@ -412,7 +412,7 @@ vertexSubsetData<data> bfsEdgeMapData(graph<vertex> &GA, VS &vs, F f,
       return ret;
     }
   }
-  printf("step3!\n");
+  //printf("step3!\n");
   if (!(fl & no_dense) && m + outDegrees > threshold)
   {
     if (degrees)
@@ -420,27 +420,27 @@ vertexSubsetData<data> bfsEdgeMapData(graph<vertex> &GA, VS &vs, F f,
     if (frontierVertices)
       free(frontierVertices);
     vs.toDense();
-  printf("step3-1!\n");
+  //printf("step3-1!\n");
     if(fl & dense_forward){
-  printf("step3-2!\n");
+  //printf("step3-2!\n");
       vertexSubsetData<data> ret = edgeMapDenseForward<data, vertex, VS, F>(GA, vs, f, fl);
       ret.setD(vs.getD(),vs.getD_size());
       ret.setS(vs.getS(),vs.getS_size());
-  printf("step3-3!\n");
+  //printf("step3-3!\n");
       return ret;
     }else {
-  printf("step3-4!\n");
+  //printf("step3-4!\n");
       vertexSubsetData<data> ret = edgeMapDense<data, vertex, VS, F>(GA, vs, f, fl);
       ret.setD(vs.getD(),vs.getD_size());
       ret.setS(vs.getS(),vs.getS_size());
-  printf("step3-5!\n");
+  //printf("step3-5!\n");
       return ret;
     }
     //return (fl & dense_forward) ? edgeMapDenseForward<data, vertex, VS, F>(GA, vs, f, fl) : edgeMapDense<data, vertex, VS, F>(GA, vs, f, fl);
   }
   else
   {
-  printf("step4!\n");
+  //printf("step4!\n");
     //通过frontierVertices这个vertex*数组，我们重新构造他们后继的subsetVertex，很合理。
     if(should_output(fl) && fl & sparse_no_filter){
       vertexSubsetData<data> ret = edgeMapSparse_no_filter<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl);
@@ -453,13 +453,13 @@ vertexSubsetData<data> bfsEdgeMapData(graph<vertex> &GA, VS &vs, F f,
       ret.setS(vs.getS(),vs.getS_size());
       return ret;
     }
-  printf("step5!\n");
+  //printf("step5!\n");
     //通过frontierVertices这个vertex*数组，我们重新构造他们后继的subsetVertex，很合理。
     auto vs_out =
         (should_output(fl) && fl & sparse_no_filter) ? // only call snof when we output
             edgeMapSparse_no_filter<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl)
                                                      : edgeMapSparse<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl);
-  printf("step6!\n");
+  //printf("step6!\n");
     vs_out.setD(vs.getD(), vs.getD_size());
     vs_out.setS(vs.getS(), vs.getS_size());
     free(degrees);
@@ -735,7 +735,7 @@ int parallel_main(int argc, char *argv[])
   bool binary = P.getOptionValue("-b");
   bool mmap = P.getOptionValue("-m");
   // cout << "mmap = " << mmap << endl;
-  long rounds = P.getOptionLongValue("-rounds", 3);
+  long rounds = P.getOptionLongValue("-rounds", 1);
   //注意这里运用compressed参数才会进来这里，不然到下面那个else看看吧
   if (compressed)
   {

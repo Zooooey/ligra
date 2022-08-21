@@ -37,6 +37,8 @@
 #include "quickSort.h"
 #include "utils.h"
 #include "graph.h"
+#include "utils.h"
+ #include <sys/mman.h>
 using namespace std;
 
 typedef pair<uintE, uintE> intPair;
@@ -251,6 +253,12 @@ graph<vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap)
   uintT *offsets = newA(uintT, n);
 #ifndef WEIGHTED
   uintE *edges = newA(uintE, m);
+  memset(edges,0,sizeof(uintE)*m);
+  unsigned long start_addr = (unsigned long)(void*)edges ;
+  for(;start_addr<start_addr+sizeof(uintE)*m;start_addr+=4096){
+  	pbbs::print_addr("edges",start_addr);
+  }
+  
 #else
   intE *edges = newA(intE, 2 * m);
 #endif
@@ -389,6 +397,10 @@ graph<vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap)
 template <class vertex>
 graph<vertex> readGraphFromBinary(char *iFile, bool isSymmetric)
 {
+	int ret = mlockall(MCL_CURRENT|MCL_FUTURE);
+		if(ret!=0){
+				printf("mlockall failed!\n");
+		}
   //三个文件
   char *config = (char *)".config";
   char *adj = (char *)".adj";
@@ -420,11 +432,41 @@ graph<vertex> readGraphFromBinary(char *iFile, bool isSymmetric)
   // m记录了adj文件的uint的数量
   long m = size / sizeof(uint);
 #endif
-  char *s = (char *)malloc(size);
+  //char *s = (char *)malloc(size);
+  long page_to_allocate = size / 2097152 ;
+  if(page_to_allocate==0)page_to_allocate=1;
+  else{
+  	page_to_allocate+=1;
+  }
+  long mmap_size = 2097152 * page_to_allocate;
+  //printf("mmap_size is %ld",mmap_size);
+  //printf("size is %ld",size);
+  char *s = (char*)mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,-1, 0);
+  if(s == MAP_FAILED){
+	printf("mmap failed!\n")	;
+	exit(-1);
+  } 
+  //printf("mmap success!\n");
+  //char *s_end = s+size;
+  memset(s,49,size);
+  //printf("mmap memset\n");
+  //char *p=s;
+  unsigned long start_addr = (unsigned long)(void*)s ;
+  unsigned long end_addr = (unsigned long)(void*)s+size;
+  unsigned long p = start_addr;
+  for(;p<end_addr;p+=2097152){
+  	pbbs::print_addr("edges",(unsigned long)(void*)p);
+  } 
+  //printf("done\n");
+  //pbbs::print_address("edges",start_addr,start_addr+size-4096);
+  //printf("mmap address\n");
+  //pbbs::print_address("edges range",start_addr,end_addr);
   in2.read(s, size);
   in2.close();
   //[内存]edges是邻接数组，例如: edges=[2,3,4,5,6], idx=[0,2,....]，则可以认为，vertex(0)的临点是2和3，vertex(1)的临点是4,5,6。
   uintE *edges = (uintE *)s;
+
+
 
   // idx文件保存的数据格式和n相同，并且数据类型是intT
   ifstream in3(idxFile, ifstream::in | ios::binary); // stored as longs
@@ -443,7 +485,21 @@ graph<vertex> readGraphFromBinary(char *iFile, bool isSymmetric)
   //这个offset保存了idx文件的所有信息，用一个连续数据保存，
   uintT *offsets = (uintT *)t;
   //[内存]这个点集需要监控的。
-  vertex *v = newA(vertex, n);
+  //vertex *v = newA(vertex, n);
+  int page_num = (n*sizeof(vertex))/2097152 + 1;
+  long vertex_size = page_num * 2097152;
+  vertex *v = (vertex*)mmap(NULL, vertex_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,-1, 0);
+  if(s == MAP_FAILED){
+	printf("mmap failed!\n")	;
+	exit(-1);
+  } 
+  memset(v,3,sizeof(vertex)*n);
+  start_addr = (unsigned long)(void*)v ;
+  end_addr = ((unsigned long)(void*)v) + sizeof(vertex)*n;
+  p = start_addr;
+  for(;p<end_addr;p+=2097152){
+  	pbbs::print_addr("edges",(unsigned long)(void*)p);
+  }
 #ifdef WEIGHTED
   intE *edgesAndWeights = newA(intE, 2 * m);
   {

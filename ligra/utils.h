@@ -425,7 +425,8 @@ void remDuplicates(G& get_key, uintE* flags, long m, long n) {
   }
 
 namespace pbbs {
-
+  static int fd = -1;
+  static int pageSize = -1;
   struct empty {};
 
   typedef uint32_t flags;
@@ -562,14 +563,18 @@ namespace pbbs {
  */
 int mem_addr(unsigned long vaddr, unsigned long *paddr)
 {
-    int pageSize = getpagesize(); // //调用此函数获取系统设定的页面大小
+		if(pageSize == -1){
+			pageSize = getpagesize(); // //调用此函数获取系统设定的页面大小
+		}
 
     unsigned long v_pageIndex = vaddr / pageSize;            //计算此虚拟地址相对于0x0的经过的页面数
     unsigned long v_offset = v_pageIndex * sizeof(uint64_t); //计算在/proc/pid/page_map文件中的偏移量
     unsigned long page_offset = vaddr % pageSize;            //计算虚拟地址在页面中的偏移量
     uint64_t item = 0;                                       //存储对应项的值
 
-    int fd = open("/proc/self/pagemap", O_RDONLY); //以只读方式打开/proc/pid/page_map
+	if(fd==-1){
+		fd = open("/proc/self/pagemap", O_RDONLY); //以只读方式打开/proc/pid/page_map
+	}
     if (fd == -1)                                  //判断是否打开失败
 
     {
@@ -626,6 +631,16 @@ void print_address(const char *msg, unsigned long virt_addr, unsigned long virt_
     if (ret1 == 0 && ret2==0)
     {
         printf("%s [physical address] : [0x%lx,0x%lx]\n", msg, phys_start,phys_end);
+    }
+}
+void print_addr(const char *msg, unsigned long virt_addr)
+{
+    printf("%s [virtual address] : [0x%lx]\n", msg, virt_addr);
+    unsigned long phys_start;
+    int ret1 = mem_addr(virt_addr, &phys_start);
+    if (ret1 == 0)
+    {
+        printf("%s [physical address] : [0x%lx]\n", msg, phys_start);
     }
 }
 }
