@@ -60,10 +60,14 @@ void Compute(graph<vertex>& GA, commandLine P) {
   pbbs::print_address("Fontier bool array", (unsigned long)(void*)D, (unsigned long)(void*)(D + n));
   Frontier.setD(D,sizeof(bool)*n);
   Frontier.setS(S,sizeof(uintE)*n);
+  Frontier.setShouldFree(false);
   while(!Frontier.isEmpty()){ //loop until frontier is empty
     vertexSubset output = bfsEdgeMap(GA, Frontier, BFS_F(Parents));
+    printf("return from bfsEdgeMap!\n");
     Frontier.del();
+    printf("Frontier.del()!\n");
     Frontier = output; //set new frontier
+    printf("=output\n");
   } 
   Frontier.del();
   free(Parents); 

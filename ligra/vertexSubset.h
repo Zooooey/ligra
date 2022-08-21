@@ -37,9 +37,9 @@ struct vertexSubsetData {
   : n(0), m(0), s(NULL), d(NULL), isDense(0) { }
 
   void del() {
-    if(!shouldFree)return;
+    /*if(!shouldFree)return;
     if (d != NULL) free(d);
-    if (s != NULL) free(s);
+    if (s != NULL) free(s);*/
   }
 
   // Sparse
@@ -186,9 +186,9 @@ struct vertexSubsetData<pbbs::empty> {
   }
 
   void del() {
-    if(!shouldFree)return;
+    /*if(!shouldFree)return;
     if (d != NULL) free(d);
-    if (s != NULL) free(s);
+    if (s != NULL) free(s);*/
   }
 
   // Sparse
