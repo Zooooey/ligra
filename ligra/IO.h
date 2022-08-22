@@ -489,7 +489,7 @@ graph<vertex> readGraphFromBinary(char *iFile, bool isSymmetric)
   int page_num = (n*sizeof(vertex))/2097152 + 1;
   long vertex_size = page_num * 2097152;
   vertex *v = (vertex*)mmap(NULL, vertex_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,-1, 0);
-  if(s == MAP_FAILED){
+  if(v == MAP_FAILED){
 	printf("mmap failed!\n")	;
 	exit(-1);
   } 
@@ -498,7 +498,7 @@ graph<vertex> readGraphFromBinary(char *iFile, bool isSymmetric)
   end_addr = ((unsigned long)(void*)v) + sizeof(vertex)*n;
   p = start_addr;
   for(;p<end_addr;p+=2097152){
-  	pbbs::print_addr("edges",(unsigned long)(void*)p);
+  	pbbs::print_addr("Vertices",(unsigned long)(void*)p);
   }
 #ifdef WEIGHTED
   intE *edgesAndWeights = newA(intE, 2 * m);
