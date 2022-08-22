@@ -37,11 +37,14 @@ public:
   : V(VV), n(nn), m(mm), allocatedInplace(ai), inEdges(_inEdges) { }
 
   void del() {
-    if (allocatedInplace == NULL)
-      for (long i=0; i < n; i++) V[i].del();
-    else free(allocatedInplace);
-    free(V);
-    if(inEdges != NULL) free(inEdges);
+    //if (allocatedInplace == NULL)
+     // for (long i=0; i < n; i++) V[i].del();
+    //else free(allocatedInplace);
+    //else munmap(allocatedInplace, sizeof());
+    //munmap(V,n*sizeof(vertex));
+    //free(V);
+    //if(inEdges != NULL) free(inEdges);
+    //if(inEdges != NULL) munmap(inEdges);
   }
 };
 

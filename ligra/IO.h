@@ -617,6 +617,7 @@ graph<vertex> readGraphFromBinary(char *iFile, bool isSymmetric)
 #endif
   }
   free(offsets);
+  printf("before return?\n");
 #ifndef WEIGHTED
   //v是一个连续内存空间，记录点集；n是点的数量；m是adj数组的长度，edges就是adj数组。这两个结构都是以指针的形势传入，所以监控内存可以不用在里面监控
   Uncompressed_Mem<vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges);
