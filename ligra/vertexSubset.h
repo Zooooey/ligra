@@ -155,6 +155,19 @@ struct vertexSubsetData<pbbs::empty> {
     s[0] = v;
   }
 
+
+  void refresh(long _n, uintE v) {
+    n=_n;
+    m=1;
+    d = NULL;
+    isDense = 0;
+    if(s!=NULL){
+      free(s);
+    }
+    s = newA(uintE,1);
+    s[0] = v;
+  }
+
   // A vertexSubset from array of vertex indices.
   vertexSubsetData<pbbs::empty>(long _n, long _m, S* indices)
   : n(_n), m(_m), s(indices), d(NULL), isDense(0) {}
