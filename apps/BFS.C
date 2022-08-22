@@ -25,8 +25,8 @@
 
 struct BFS_F
 {
-  uintE *Parents = MAP_FAILED;
-  vertexSubset Frontier * = NULL;
+  uintE *Parents; 
+  //vertexSubset *Frontier  = NULL;
   BFS_F(uintE *_Parents) : Parents(_Parents) {}
   inline bool update(uintE s, uintE d)
   { // Update
@@ -56,6 +56,9 @@ void Compute(graph<vertex> &GA, commandLine P)
   // creates Parents array, initialized to all -1, except for start
   //[内存]new A是对malloc的一个别名，这里创建了一个连续内存空间。
   // uintE* Parents = newA(uintE,n);
+  static uintE *Parents = MAP_FAILED;
+  static vertexSubset* Frontier = NULL;
+  
   if (Parents == MAP_FAILED)
   {
     int page_num = (n * sizeof(uintE)) / 2097152 + 1;
@@ -97,9 +100,9 @@ void Compute(graph<vertex> &GA, commandLine P)
       exit(-1);
     }
     memset(S, 0, sizeof(uintE) * n);
-    start_addr = (unsigned long)(void *)S;
-    end_addr = ((unsigned long)(void *)S) + sizeof(uintE) * n;
-    p = start_addr;
+    unsigned long start_addr = (unsigned long)(void *)S;
+    unsigned long end_addr = ((unsigned long)(void *)S) + sizeof(uintE) * n;
+    unsigned long p = start_addr;
     for (; p < end_addr; p += 2097152)
     {
       char c = *((char *)p);
@@ -126,9 +129,9 @@ void Compute(graph<vertex> &GA, commandLine P)
     }
     // pbbs::print_address("Fontier vertices", (unsigned long)(void*)S, (unsigned long)(void*)(S + n));
     // pbbs::print_address("Fontier bool array", (unsigned long)(void*)D, (unsigned long)(void*)(D + n));
-    Frontier.setD(D, sizeof(bool) * n);
-    Frontier.setS(S, sizeof(uintE) * n);
-    Frontier.setShouldFree(false);
+    Frontier->setD(D, sizeof(bool) * n);
+    Frontier->setS(S, sizeof(uintE) * n);
+    Frontier->setShouldFree(false);
   }
   else
   {
