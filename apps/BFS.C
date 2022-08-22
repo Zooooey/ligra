@@ -56,9 +56,9 @@ void Compute(graph<vertex> &GA, commandLine P)
   // creates Parents array, initialized to all -1, except for start
   //[内存]new A是对malloc的一个别名，这里创建了一个连续内存空间。
   // uintE* Parents = newA(uintE,n);
-  static uintE *Parents = MAP_FAILED;
+  static uintE *Parents = NULL;
 
-  if (Parents == MAP_FAILED)
+  if (Parents == NULL)
   {
     int page_num = (n * sizeof(uintE)) / 2097152 + 1;
     long parent_size = page_num * 2097152;
@@ -85,11 +85,11 @@ void Compute(graph<vertex> &GA, commandLine P)
 
   Parents[start] = start;
 
-  static uintE *S = MAP_FAILED;
-  static bool *D = MAP_FAILED;
+  static uintE *S = NULL;
+  static bool *D = NULL;
 
   //以单个vertex初始化一个vertexSubset
-  if (S == MAP_FAILED)
+  if (S == NULL)
   {
     // uintE* S = newA(uintE,n);
     int S_page_num = (n * sizeof(uintE)) / 2097152 + 1;
@@ -114,7 +114,7 @@ void Compute(graph<vertex> &GA, commandLine P)
     int D_page_num = (n * sizeof(bool)) / 2097152 + 1;
     long D_size = D_page_num * 2097152;
     bool *D = (bool *)mmap(NULL, D_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    if (D == MAP_FAILED)
+    if (D == NULL)
     {
       printf("mmap failed!\n");
       exit(-1);
@@ -138,9 +138,9 @@ void Compute(graph<vertex> &GA, commandLine P)
   }
 
   vertexSubset Frontier(n, start); // creates initial frontier
-  Frontier->setD(D, sizeof(bool) * n);
-  Frontier->setS(S, sizeof(uintE) * n);
-  Frontier->setShouldFree(false);
+  Frontier.setD(D, sizeof(bool) * n);
+  Frontier.setS(S, sizeof(uintE) * n);
+  Frontier.setShouldFree(false);
 
   int times = 0;
   while (!Frontier.isEmpty())
