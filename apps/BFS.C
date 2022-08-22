@@ -56,21 +56,21 @@ void Compute(graph<vertex> &GA, commandLine P)
   // creates Parents array, initialized to all -1, except for start
   //[内存]new A是对malloc的一个别名，这里创建了一个连续内存空间。
   // uintE* Parents = newA(uintE,n);
-  static uintE *Parents = NULL;
+  static uintE *s_parents = NULL;
 
-  if (Parents == NULL)
+  if (s_parents == NULL)
   {
     int page_num = (n * sizeof(uintE)) / 2097152 + 1;
     long parent_size = page_num * 2097152;
-    uintE *Parents = (uintE *)mmap(NULL, parent_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    if (Parents == MAP_FAILED)
+    s_parents = (uintE *)mmap(NULL, parent_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    if (s_parents == MAP_FAILED)
     {
       printf("mmap failed!\n");
       exit(-1);
     }
-    parallel_for(long i = 0; i < n; i++) Parents[i] = UINT_E_MAX;
-    unsigned long start_addr = (unsigned long)(void *)Parents;
-    unsigned long end_addr = ((unsigned long)(void *)Parents) + sizeof(uintE) * n;
+    parallel_for(long i = 0; i < n; i++) s_parents[i] = UINT_E_MAX;
+    unsigned long start_addr = (unsigned long)(void *)s_parents;
+    unsigned long end_addr = ((unsigned long)(void *)s_parents) + sizeof(uintE) * n;
     unsigned long p = start_addr;
     for (; p < end_addr; p += 2097152)
     {
@@ -80,10 +80,10 @@ void Compute(graph<vertex> &GA, commandLine P)
   }
   else
   {
-    parallel_for(long i = 0; i < n; i++) Parents[i] = UINT_E_MAX;
+    parallel_for(long i = 0; i < n; i++) s_parents[i] = UINT_E_MAX;
   }
 
-  Parents[start] = start;
+  s_parents[start] = start;
 
   static uintE *S = NULL;
   static bool *D = NULL;
@@ -94,7 +94,7 @@ void Compute(graph<vertex> &GA, commandLine P)
     // uintE* S = newA(uintE,n);
     int S_page_num = (n * sizeof(uintE)) / 2097152 + 1;
     long S_size = S_page_num * 2097152;
-    uintE *S = (uintE *)mmap(NULL, S_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    S = (uintE *)mmap(NULL, S_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     if (S == MAP_FAILED)
     {
       printf("mmap failed!\n");
@@ -113,7 +113,7 @@ void Compute(graph<vertex> &GA, commandLine P)
     // bool* D = newA(bool,n);
     int D_page_num = (n * sizeof(bool)) / 2097152 + 1;
     long D_size = D_page_num * 2097152;
-    bool *D = (bool *)mmap(NULL, D_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    D = (bool *)mmap(NULL, D_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     if (D == NULL)
     {
       printf("mmap failed!\n");
@@ -136,6 +136,7 @@ void Compute(graph<vertex> &GA, commandLine P)
     memset(S, 0, sizeof(uintE) * n);
     memset(D, 0, sizeof(bool) * n);
   }
+  printf("Parents init done!\n");
 
   vertexSubset Frontier(n, start); // creates initial frontier
   Frontier.setD(D, sizeof(bool) * n);
@@ -145,7 +146,7 @@ void Compute(graph<vertex> &GA, commandLine P)
   int times = 0;
   while (!Frontier.isEmpty())
   { // loop until frontier is empty
-    vertexSubset output = bfsEdgeMap(GA, Frontier, BFS_F(Parents));
+    vertexSubset output = bfsEdgeMap(GA, Frontier, BFS_F(s_parents));
     // printf("return from bfsEdgeMap!\n");
     Frontier.del();
     // printf("Frontier.del()!\n");
