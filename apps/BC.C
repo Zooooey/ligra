@@ -102,9 +102,11 @@ void Compute(graph<vertex>& GA, commandLine P) {
   if(NumPaths == NULL){
     NumPaths = pbbs::mmap_huge_page(sizeof(fType)*n, "NumPaths");
     //NumPaths = newA(fType,n);
+    {parallel_for(long i=0;i<n;i++) NumPaths[i] = 0.0;}
+    pbbs::print_hugepage_addr("NumPaths", (unsigned long)(void*)NumPaths, (unsigned long)(void*)(NumPaths + n));
+  }else {
+    {parallel_for(long i=0;i<n;i++) NumPaths[i] = 0.0;}
   }
-  {parallel_for(long i=0;i<n;i++) NumPaths[i] = 0.0;}
-  pbbs::print_hugepage_addr("NumPaths", (unsigned long)(void*)NumPaths, (unsigned long)(void*)(NumPaths + n));
   //起点置1.0
   NumPaths[start] = 1.0;
 
@@ -113,9 +115,12 @@ void Compute(graph<vertex>& GA, commandLine P) {
   if(Visited == NULL){
     Visited = pbbs::mmap_huge_page(sizeof(bool)*n,"Visited");
     //Visited = newA(bool,n);
+    {parallel_for(long i=0;i<n;i++) Visited[i] = 0;}
+    pbbs::print_hugepage_addr("Visited", (unsigned long)(void*)Visited, (unsigned long)(void*)(Visited + n));
+  } else {
+    {parallel_for(long i=0;i<n;i++) Visited[i] = 0;}
   }
-  {parallel_for(long i=0;i<n;i++) Visited[i] = 0;}
-  pbbs::print_hugepage_addr("Visited", (unsigned long)(void*)Visited, (unsigned long)(void*)(Visited + n));
+  
   Visited[start] = 1;
 
   //构建一个vertexSubset，只有一个起点start。
@@ -144,9 +149,13 @@ void Compute(graph<vertex>& GA, commandLine P) {
   if(Dependencies == NULL){
     Dependencies = pbbs::mmap_huge_page(sizeof(fType)*n,"Dependencies");
     //Dependencies = newA(fType,n);
+    {parallel_for(long i=0;i<n;i++) Dependencies[i] = 0.0;}
+    pbbs::print_hugepage_addr("Dependencies", (unsigned long)(void*)Dependencies, (unsigned long)(void*)(Dependencies + n));
+  } else {
+    {parallel_for(long i=0;i<n;i++) Dependencies[i] = 0.0;}
   }
-  {parallel_for(long i=0;i<n;i++) Dependencies[i] = 0.0;}
-  pbbs::print_hugepage_addr("Dependencies", (unsigned long)(void*)Dependencies, (unsigned long)(void*)(Dependencies + n));
+  
+  
 
 
   //刚才的NumPaths换了个指针变成inverse?
