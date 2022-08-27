@@ -88,7 +88,7 @@ void Compute(graph<vertex> &GA, commandLine P)
   {
     int page_num = (n * sizeof(double)) / 2097152 + 1;
     long size = page_num * 2097152;
-    p_curr = (double *)mmap(NULL, parent_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    p_curr = (double *)mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     if (p_curr == MAP_FAILED)
     {
       printf("mmap failed!\n");
@@ -117,7 +117,7 @@ void Compute(graph<vertex> &GA, commandLine P)
   {
     int page_num = (n * sizeof(double)) / 2097152 + 1;
     long size = page_num * 2097152;
-    p_next = (double *)mmap(NULL, parent_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    p_next = (double *)mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     if (p_next == MAP_FAILED)
     {
       printf("mmap failed!\n");

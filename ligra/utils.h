@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/mman.h>
 using namespace std;
 
 // Needed to make frequent large allocations efficient with standard
@@ -804,17 +805,17 @@ namespace pbbs
 
   void print_hugepage_addr(const char *msg, unsigned long start_virt_addr, unsigned long end_virt_addr)
   {
-    static hugepage = 2097152;
-    p = start_virt_addr;
+    static size_t hugepage = 2097152;
+    unsigned long p = start_virt_addr;
     for (; p < end_virt_addr; p += hugepage)
       print_addr(msg, p);
   }
 
-  void *mmap_huge_page(size_t bytes_to_allocate, consta char *msg)
+  void *mmap_huge_page(size_t bytes_to_allocate, const char *msg)
   {
     int page_num = bytes_to_allocate / 2097152 + 1;
     size_t mmap_size = page_num * 2097152;
-    void ret = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    void* ret = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
     if (ret == MAP_FAILED)
     {
       printf("%s mmap huge page failed!\n", msg);

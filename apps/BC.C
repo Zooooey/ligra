@@ -96,26 +96,26 @@ template <class vertex>
 void Compute(graph<vertex>& GA, commandLine P) {
   long start = P.getOptionLongValue("-r",0);
   long n = GA.n;
-
+	printf("???\n");
   //初始化一个连续空间NumPaths，并全部置0.0;
   static fType* NumPaths = NULL;
   if(NumPaths == NULL){
-    NumPaths = mmap_huge_page(sizeof(fType)*n, "NumPaths");
+    NumPaths = pbbs::mmap_huge_page(sizeof(fType)*n, "NumPaths");
     //NumPaths = newA(fType,n);
   }
   {parallel_for(long i=0;i<n;i++) NumPaths[i] = 0.0;}
-  print_hugepage_addr("NumPaths", (unsigned long)(void*)NumPaths, (unsigned long)(void*)(NumPaths + n));
+  pbbs::print_hugepage_addr("NumPaths", (unsigned long)(void*)NumPaths, (unsigned long)(void*)(NumPaths + n));
   //起点置1.0
   NumPaths[start] = 1.0;
 
   //visited结构全部初始化0，起点置1
   static bool* Visited = NULL;
   if(Visited == NULL){
-    Visited = mmap_huge_page(sizeof(bool)*n,"Visited");
+    Visited = pbbs::mmap_huge_page(sizeof(bool)*n,"Visited");
     //Visited = newA(bool,n);
   }
   {parallel_for(long i=0;i<n;i++) Visited[i] = 0;}
-  print_hugepage_addr("Visited", (unsigned long)(void*)Visited, (unsigned long)(void*)(Visited + n));
+  pbbs::print_hugepage_addr("Visited", (unsigned long)(void*)Visited, (unsigned long)(void*)(Visited + n));
   Visited[start] = 1;
 
   //构建一个vertexSubset，只有一个起点start。
@@ -142,11 +142,11 @@ void Compute(graph<vertex>& GA, commandLine P) {
   //又是一个连续结构，初始化置0
   static fType* Dependencies = NULL;
   if(Dependencies == NULL){
-    Dependencies = mmap_huge_page(sizeof(fType)*n,"Dependencies")
+    Dependencies = pbbs::mmap_huge_page(sizeof(fType)*n,"Dependencies");
     //Dependencies = newA(fType,n);
   }
   {parallel_for(long i=0;i<n;i++) Dependencies[i] = 0.0;}
-  print_hugepage_addr("Dependencies", (unsigned long)(void*)Dependencies, (unsigned long)(void*)(Dependencies + n));
+  pbbs::print_hugepage_addr("Dependencies", (unsigned long)(void*)Dependencies, (unsigned long)(void*)(Dependencies + n));
 
 
   //刚才的NumPaths换了个指针变成inverse?
@@ -190,7 +190,10 @@ void Compute(graph<vertex>& GA, commandLine P) {
   parallel_for(long i=0;i<n;i++) {
     Dependencies[i]=(Dependencies[i]-inverseNumPaths[i])/inverseNumPaths[i];
   }
-  free(inverseNumPaths);
-  free(Visited);
-  free(Dependencies);
+  //free(inverseNumPaths);
+  //free(Visited);
+  //free(Dependencies);
+  munmap(inverseNumPaths,n*sizeof(fType));
+  munmap(Visited,n*sizeof(bool));
+  munmap(Dependencies,n*sizeof(fType));
 }
