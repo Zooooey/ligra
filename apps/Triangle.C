@@ -99,7 +99,7 @@ void Compute(graph<vertex>& GA, commandLine P) {
   //bool* frontier = newA(bool,n);
   static bool* frontier = NULL;
   if(frontier == NULL){
-    counts = pbbs::mmap_huge_page(sizeof(bool)*n, "frontier");
+    frontier = pbbs::mmap_huge_page(sizeof(bool)*n, "frontier");
     {parallel_for(long i=0;i<n;i++) frontier[i] = 1;}
     pbbs::print_hugepage_addr("frontier", (unsigned long)(void*)frontier, (unsigned long)(void*)(frontier + n));
   }else {
@@ -114,5 +114,6 @@ void Compute(graph<vertex>& GA, commandLine P) {
   edgeMap(GA,Frontier,countF<vertex>(GA.V,counts), -1, no_output);
   long count = sequence::plusReduce(counts,n);
   cout << "triangle count = " << count << endl;
-  Frontier.del(); free(counts);
+  //Frontier.del(); 
+  //munmap(counts,n*sizeof(bool));
 }
